@@ -5,11 +5,11 @@ describe('data-bind syntax', function () {
     it('Should parse', function (done) {
         var call = 1
         parse(
-        'css-available enabled|not : model.notAvailable, value: value',
+        'css-available- enabled|not : model.notAvailable, value: value',
         function (type, param, path, filters) {
             if (call == 1) {
                 type.should.equal('css')
-                param.should.equal('available enabled')
+                param.should.equal('available- enabled')
                 filters.should.eql(['not'])
                 path.should.equal('model.notAvailable')
             } else if (call == 2) {
