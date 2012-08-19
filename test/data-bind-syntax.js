@@ -34,4 +34,12 @@ describe('data-bind syntax', function () {
             done()
         })
     })
+
+    it('Should allow path omission', function (done) {
+        parse('hello', function (type, param, path) {
+            type.should.equal('hello')
+            path.should.equal('')
+            done()
+        })
+    })
 })
