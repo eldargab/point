@@ -1,0 +1,15 @@
+{
+  "name": "point",
+  "description": "Client-site MV* framework for the web",
+  "version": "0.0.1alpha",
+  "scripts": {
+    "test": "mocha -R spec",
+    "examples": "site examples"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*",
+    "express-site": "git://github.com/eldargab/express-site.git",
+    "exposer": "git://github.com/eldargab/exposer.js.git"
+  }
+}
