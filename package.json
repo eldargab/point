@@ -4,7 +4,8 @@
   "version": "0.0.1alpha",
   "scripts": {
     "test": "mocha -R spec",
-    "examples": "site examples"
+    "examples": "site examples",
+    "build": "node build.js"
   },
   "devDependencies": {
     "mocha": "*",
