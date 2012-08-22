@@ -1,5 +1,5 @@
 var $ = require('jquery')
-var ui = require('points')
+var ui = require('point')
 var computable = ui.mixin('computable')
 
 // App logic
