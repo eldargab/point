@@ -109,6 +109,8 @@ exports.mixin = util.mixin
 
 exports.thisFn = util.thisFn
 
+exports.use = util.use
+
 })
 require.register("point/util", function(module, exports, require) {
 var uid = 0
@@ -131,7 +133,10 @@ exports.extend = function (Klass, parent) {
     } else if (arguments.length > 1) {
         Klass.prototype = Object.create(parent)
     }
-    Klass.use = use
+    Klass.use = function () {
+        exports.use.apply(this.prototype, arguments)
+        return this
+    }
     Klass.extend = function (ChildKlass) {
         ChildKlass = ChildKlass || function () {}
         return exports.extend(ChildKlass, this)
@@ -139,16 +144,16 @@ exports.extend = function (Klass, parent) {
     return Klass
 }
 
-function use (proto) {
+exports.use = function use (proto) {
     switch (typeof proto) {
         case 'function':
             var protoHasEnumerables = false
             for (var key in proto.prototype) {
-                this.prototype[key] = proto.prototype[key]
+                this[key] = proto.prototype[key]
                 protoHasEnumerables = true
             }
             if (!protoHasEnumerables)
-                proto.apply(this.prototype, Array.prototype.slice.call(arguments, 1))
+                proto.apply(this, Array.prototype.slice.call(arguments, 1))
             break
         case 'string':
             proto = exports.mixin(proto)
@@ -156,7 +161,7 @@ function use (proto) {
             break
         default:
             for (var key in proto) {
-                this.prototype[key] = proto[key]
+                this[key] = proto[key]
             }
     }
     return this
@@ -727,6 +732,8 @@ Emitter.prototype.emit = function (event, var_args) {
         handlers[key].apply(this, args)
     }
 }
+
+Emitter.prototype.use = util.use
 })
 
 return require
