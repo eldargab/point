@@ -2,11 +2,12 @@ var sinon = require('sinon')
 var Emitter = require('../lib/emitter')
 
 describe('Emitter', function () {
-    var l, l2, ee
+    var l, l2, l3, ee
 
     beforeEach(function () {
         l = sinon.spy()
         l2 = sinon.spy()
+        l3 = sinon.spy()
         ee = new Emitter
     })
 
@@ -70,5 +71,20 @@ describe('Emitter', function () {
 
         ee.emit('foo')
         calls.should.equal('12')
+    })
+
+    it('.setListener()', function () {
+        ee.on('foo', l)
+        ee = Object.create(ee)
+        ee.on('foo', l2)
+        var ee2 = Object.create(ee)
+        ee2.setListener('foo', l3).emit('foo')
+        l3.calledOnce.should.be.true
+        l2.called.should.be.false
+        l.called.should.be.false
+
+        ee.setListener('foo').emit('foo')
+        l2.called.should.be.false
+        l.called.should.be.false
     })
 })
