@@ -100,6 +100,13 @@ describe('View', function () {
             v.attach('bar', m)
             m.emit('foo')
         })
+
+        it('.onmodel("self",...) means listen to view itself', function (done) {
+            view.onmodel('self', 'foo', function () {
+                done()
+            })
+            view.emit('foo')
+        })
     })
 
     describe('.parsePath(path)', function () {
@@ -181,6 +188,14 @@ describe('View', function () {
             view.bindPoint(p, 'foo.a')
             m.set('a', 'b')
             p.val.should.equal('b')
+        })
+
+        it('Model `self` means view itself', function () {
+            view.set('foo', 'foo')
+            view.bindPoint(p, 'self.foo')
+            p.val.should.equal('foo')
+            view.set('foo', 'bar')
+            p.val.should.equal('bar')
         })
     })
 })
