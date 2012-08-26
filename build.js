@@ -1,6 +1,6 @@
 var Bundle = require('exposer').Bundle
 
-Bundle('index.js', function () {
+Bundle('build/point.js', function () {
     this.add('.', 'lib', {as: 'point'})
 
     this.includeRequire()
