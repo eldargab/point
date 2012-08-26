@@ -18,13 +18,13 @@
 				<input id="toggle-all" data-bind="value:toggleAll, value:allCompleted" type="checkbox">
 				<label for="toggle-all">Mark all as complete</label>
 				<ul id="todo-list" data-bind="foreach:todos">
-					<li data-bind="css-completed:isDone, css-editing:isEditing, css-hidden:hidden">
+					<li data-bind="css-completed:isDone, css-editing:self.isEditing, css-hidden:self.hidden">
 						<div class="view">
 							<input class="toggle" data-bind="value:isDone" type="checkbox">
-							<label data-bind="text:title, event-dblclick:edit"></label>
+							<label data-bind="text:title, event-dblclick:self.edit"></label>
 							<button class="destroy" data-bind="event-click:del"></button>
 						</div>
-						<input class="edit" data-bind="value:title, event-keypress|enter:endEdit">
+						<input class="edit" data-bind="value:title, event-keypress|enter:self.endEdit">
 					</li>
 				</ul>
 			</section>

@@ -1,10 +1,10 @@
 var $ = require('jquery')
-var ui = require('point')
-var computable = ui.mixin('computable')
+var Point = require('point')
+var computable = Point.mixin('computable')
 
 // App logic
 
-var Todo = ui.Model.extend(function Todo () {
+var Todo = Point.Model.extend(function Todo () {
     this.set('createdAt', new Date)
 })
 
@@ -12,16 +12,7 @@ Todo.prototype.del = function () {
     this.emit('delete')
 }
 
-Todo.prototype.edit = function () {
-    this.set('isEditing', true)
-}
-
-Todo.prototype.endEdit = function () {
-    this.set('isEditing', false)
-}
-
-
-var App = ui.Model.extend()
+var App = Point.Model.extend()
 
 App.use('collection')
 
@@ -38,15 +29,10 @@ App.prototype.on('change:newTodoTitle', function () {
     todo.set('title', title)
     todo.on('delete', function () {
         self.remove(this)
-    })
-    this.add(todo)
-})
-
-App.prototype.on('add', function (todo) {
-    var self = this
-    todo.on('change:isDone', function () {
+    }).on('change:isDone', function () {
         self.emit('itemDone')
     })
+    this.add(todo)
 })
 
 App.prototype.clearDoneItems = function () {
@@ -67,14 +53,22 @@ App.use(computable, 'left', ['change:done', 'change:length'], function () {
     return this.length - this.get('done')
 })
 
-var app = new App
+App.prototype.set('mode', 'all')
 
-app.set('mode', 'all')
+var app = new App
 
 
 // Views
 
-var TodoView = ui.View.extend()
+var TodoView = Point.View.extend()
+
+TodoView.prototype.edit = function () {
+    this.set('isEditing', true)
+}
+
+TodoView.prototype.endEdit = function () {
+    this.set('isEditing', false)
+}
 
 TodoView.prototype.point_focus = function (el) {
     return {
@@ -91,49 +85,36 @@ TodoView.prototype.filter_enter = function (eventPoint) {
     return eventPoint
 }
 
-TodoView.prototype.hide = function () {
-    this.hidden = true
-    this._hide && this._hide.set(this.hidden)
-}
-
-TodoView.prototype.show = function () {
-    this.hidden = false
-    this._hide && this._hide.set(this.hidden)
-}
-
-TodoView.prototype.bind_css_at_hidden = function (point) {
-    this._hide = point
-    this._hide.set(this.hidden)
-}
-
-TodoView.prototype.onAppMode = function () {
-    if (!this.model) return
-    var isDone = this.model.get('isDone')
+TodoView.use(computable, 'hidden', ['model:change:isDone', 'appmode', 'attach'], function () {
+    var isDone = this.model && this.model.get('isDone')
     switch (app.get('mode')) {
         case 'all':
-            this.show()
-            break
+            return false
         case 'active':
-            isDone ? this.hide() : this.show()
-            break
+            return isDone
         case 'completed':
-            isDone ? this.show() : this.hide()
-            break
-    }
-}
-
-TodoView.prototype.on('attach', function () {
-    this.onAppMode()
-    if (!this._onAppMode) {
-        app.on('change:mode', ui.thisFn(this, 'onAppMode'))
-        this.on('destroy', function () {
-            app.off('change:mode', this._onAppMode)
-        })
+            return !isDone
     }
 })
 
+TodoView.prototype.on('bind', function () {
+    var self = this
 
-var AppView = ui.View.extend()
+    this.onmodel('change:isDone')
+
+    function emitAppMode () {
+        self.emit('appmode')
+    }
+
+    app.on('change:mode', emitAppMode)
+
+    this.on('destroy', function () {
+        app.off('change:mode', emitAppMode)
+    })
+})
+
+
+var AppView = Point.View.extend()
 
 AppView.prototype.bind_foreach_at_todos = function (foreach) {
     foreach.ItemView = TodoView
@@ -152,7 +133,6 @@ AppView.prototype.point_toggleMode = function (el, mode) {
     }
 
     app.on('change:mode', onmode)
-
     onmode()
 }
 
@@ -164,11 +144,9 @@ AppView.prototype.filter_items = function (point) {
     return point
 }
 
-
-// Bootstraping
+// Bootstrap
 $(function () {
     var appView = new AppView
     appView.attach(app)
-    appView.el = document.body
-    appView.bind()
+    appView.render(document.body)
 })
