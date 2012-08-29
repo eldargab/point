@@ -26,10 +26,13 @@ describe('Model', function () {
 
     it('Emits `change` event when property is set', function () {
         m.on('change:foo', l)
+        m.on('change', l2)
         m.set('foo', 'foo')
         l.calledOnce.should.be.true
+        l2.calledWithExactly('foo').should.be.true
         m.set('foo', 'foo')
         l.calledTwice.should.be.true
+        l2.calledTwice.should.be.true
     })
 
     it('Respects onset_<prop> setters', function () {
