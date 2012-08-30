@@ -49,7 +49,7 @@ App.use(computable, 'done', ['remove', 'itemDone'], function () {
     return count
 })
 
-App.use(computable, 'left', ['change:done', 'change:length'], function () {
+App.use(computable, 'left', [':done', ':length'], function () {
     return this.length - this.get('done')
 })
 

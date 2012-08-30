@@ -35,6 +35,12 @@ describe('Model', function () {
         l2.calledTwice.should.be.true
     })
 
+    it('Emits `_change_` event before `change`', function () {
+        m.on('_change_:foo', l).on('change:foo', l2)
+        m.set('foo', 1)
+        l.calledBefore(l2)
+    })
+
     it('Respects onset_<prop> setters', function () {
         m.onset_foo = function (val, prop) {
             val.should.equal('baz')

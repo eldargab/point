@@ -11,7 +11,7 @@ describe('Computable @mixin', function () {
     })
 
     it('Adds support for computable properties', function (done) {
-        m.use(computable, 'greeting', ['change:hello', 'change:world'], function () {
+        m.use(computable, 'greeting', [':hello', ':world'], function () {
             return this.get('hello') + ' ' + this.get('world')
         })
 
@@ -69,5 +69,13 @@ describe('Computable @mixin', function () {
             onchange.called.should.be.false
             done()
         }, 10)
+    })
+
+    it('Emits `_change_` event when cache is cleared', function () {
+        m.use(computable, 'foo', ['bar'], function () {
+        })
+        m.on('_change_:foo', onchange)
+        m.emit('bar')
+        onchange.called.should.be.true
     })
 })
